@@ -32,6 +32,15 @@ O uso do Terraform transforma a infraestrutura de Data Platform em código versi
 
 ---
 
+## 🌟 Destaques do Pipeline de CI/CD Avançado
+
+Este projeto abraça práticas do estado da arte de **GitOps** com aprovações de segurança integradas.
+
+- 🛡️ **Aprovação Manual (Production Environment):** O job de Produção foi configurado de forma nativa (`environment: production`) para exigir **aprovação humana (Review)** no GitHub. Em vez de quebrar a automação tirando a flag `-auto-approve`, o Github pausa a pipeline *antes* da execução. Apenas após a revisão de um Lead, o robô liga e aplica as mudanças, provendo imensa segurança e rastreabilidade visual (Sem terminais travados pedindo para digitar YES).
+- 🧹 **Workflow de Destruição Limpa (Destroy):** Para evitar cobranças "fantasmas" indesejadas na nuvem por laboratórios esquecidos ligados, um job foi criado em `.github/workflows/destroy.yml`. Ele pode ser disparado manualmente a qualquer momento pela aba **Actions** no Github usando *workflow_dispatch*, permitindo dizimar todos os recursos com apenas 1 clique em um botão, remotamente!
+
+---
+
 ## 📂 Como o Repositório Está Organizado?
 
 Empregamos a melhor prática de "Terraform Modules".
@@ -39,7 +48,8 @@ Empregamos a melhor prática de "Terraform Modules".
 📦 lab-dataengineer
  ┣ 📂 .github
  ┃ ┗ 📂 workflows
- ┃   ┗ 📜 terraform.yml  
+ ┃   ┣ 📜 terraform.yml  (A esteira automatizada CI/CD)
+ ┃   ┗ 📜 destroy.yml    (Rotina de expurgo sob-demanda)
  ┣ 📂 modules
  ┃ ┗ 📂 data_platform 
  ┣ 📂 dev                
