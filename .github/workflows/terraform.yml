@@ -4,16 +4,21 @@ on:
   push:
     branches:
       - main
+      - development
   pull_request:
     branches:
       - main
+      - development
 
 jobs:
   terraform-dev:
     name: 'Deploy DEV Environment'
     runs-on: ubuntu-latest
     
-    # Injetando as credenciais de forma segura via Secrets do GitHub
+    # Só roda o Job do DEV se: for Push na branch development OU PR para branch development
+    if: github.ref == 'refs/heads/development' || github.base_ref == 'development'
+    
+    # Injetando as credenciais via Secrets do GitHub
     env:
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
@@ -48,14 +53,16 @@ jobs:
       run: terraform plan -out=tfplan
 
     - name: Terraform Apply (DEV)
-      # Só aplica automaticamente no DEV se houver um merge/push direto na branch MAIN
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      # Só aplica automaticamente no DEV se for push/merge na branch DEVELOPMENT
+      if: github.ref == 'refs/heads/development' && github.event_name == 'push'
       run: terraform apply -auto-approve
 
   terraform-prod:
     name: 'Deploy PROD Environment'
     runs-on: ubuntu-latest
-    needs: terraform-dev # Obriga a esperar o DEV terminar com sucesso antes de ir para PROD
+
+    # Só roda o Job do PROD se: for Push na branch main OU PR para branch main
+    if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
     
     env:
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
@@ -87,6 +94,6 @@ jobs:
       run: terraform plan -out=tfplan
 
     - name: Terraform Apply (PROD)
-      # Só aplica automaticamente no PROD se houver um merge/push na branch MAIN
+      # Só aplica automaticamente no PROD se for push/merge na branch MAIN
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: terraform apply -auto-approve
