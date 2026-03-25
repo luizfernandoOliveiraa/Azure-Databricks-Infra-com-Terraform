@@ -60,6 +60,7 @@ jobs:
   terraform-prod:
     name: 'Deploy PROD Environment'
     runs-on: ubuntu-latest
+    environment: production
 
     # Só roda o Job do PROD se: for Push na branch main OU PR para branch main
     if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
